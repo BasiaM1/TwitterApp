@@ -119,6 +119,17 @@ public class TweetController {
 
     }
 
+    @RequestMapping(value = "/like", method = RequestMethod.GET)
+    public String like(@RequestParam long tweetId){
+        Tweet t = tweetRepository.findById(tweetId).get();
+
+        t.setLikeCount(t.getLikeCount()+1);
+
+        tweetRepository.save(t);
+        return "redirect:/";
+
+    }
+
 
 //    @RequestMapping(value = "/{tweetId}/comments", method = RequestMethod.GET)
 //    public String getCommentByTweet(Model model, @PathVariable Long tweetId) {

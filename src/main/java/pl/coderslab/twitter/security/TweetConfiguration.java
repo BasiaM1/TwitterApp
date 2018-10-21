@@ -20,7 +20,7 @@ public class TweetConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.authorizeRequests()
                 .antMatchers("/user/register", "/login").anonymous()
-                .antMatchers("/user/all").permitAll()
+                .antMatchers("/user/all", "/tweet/like").permitAll()
                 .antMatchers("/user/**", "/tweet/**").authenticated()
                 .anyRequest().permitAll()
                 .and()

@@ -30,6 +30,8 @@ public class Tweet {
     @OneToMany(mappedBy = "tweet", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 
+    private int likeCount;
+
     public Date getCreated() {
         return created;
     }
@@ -74,4 +76,11 @@ public class Tweet {
     public Tweet() {
     }
 
+    public int getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
 }

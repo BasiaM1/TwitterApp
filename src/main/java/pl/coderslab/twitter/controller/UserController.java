@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import pl.coderslab.twitter.repository.MessageRepository;
 import pl.coderslab.twitter.repository.TweetRepository;
 import pl.coderslab.twitter.repository.UserRepository;
 import pl.coderslab.twitter.entity.Tweet;
@@ -18,6 +19,7 @@ import pl.coderslab.twitter.entity.User;
 
 import javax.validation.Valid;
 import javax.validation.Validator;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -31,9 +33,12 @@ public class UserController {
     TweetRepository tweetRepository;
 
     @Autowired
+    MessageRepository messageRepository;
+
+    @Autowired
     Validator validator;
 
-    @RequestMapping(value = ("/register"), method = RequestMethod.GET)
+    @RequestMapping(value = ("/register"), method = RequestMethod.GET )
     public String registerForm(Model model) {
         model.addAttribute("user", new User());
         return "userRegistration";
@@ -51,7 +56,7 @@ public class UserController {
         return "redirect:/user/" + user.getId();
     }
 
-    @RequestMapping(value = "/profile", method = RequestMethod.POST)
+    @RequestMapping(value = "/profile", method = {RequestMethod.GET,RequestMethod.POST})
     public String showProfile(){
         User loggedIn = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return "redirect:/user/" +loggedIn.getId();
@@ -70,7 +75,29 @@ public class UserController {
         model.addAttribute("userProfile", userShown);
         List<Tweet> userTweets = tweetRepository.findAllByUserId(id);
         model.addAttribute("tweets", userTweets);
+//        model.addAttribute("messages", messageRepository.findAllByReceiverId(id));
+//
+//        model.addAttribute("outbox", messageRepository.findAllBySenderId(id));
         return "profile";
+    }
+    @RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
+    public String editProfile(Model model, @PathVariable Long id) {
+
+        User user= userRepository.getOne(id);
+        model.addAttribute("user", user);
+        return "userForm";
+    }
+
+    @RequestMapping(value = "/edit/{id}", method = RequestMethod.POST)
+    public String editProfilrPost(@Valid User user, BindingResult result) {
+//        User user = userRepository.getOne(id);
+//        model.addAttribute("user", user);
+        if (result.hasErrors()) {
+            return "userForm";
+        }
+
+        userRepository.save(user);
+        return "redirect:/user/" + user.getId();
     }
 
 
@@ -83,6 +110,15 @@ public class UserController {
         return "profileVisible";
     }
 
+    @RequestMapping(value = "{id}/messages", method = RequestMethod.GET)
+    public String messages(Model model, @PathVariable Long id) {
+        User user = userRepository.getOne(id);
+        model.addAttribute("user", user);
+        model.addAttribute("inbox", messageRepository.findAllByReceiverId(id));
+
+        model.addAttribute("outbox", messageRepository.findAllBySenderId(id));
+        return "messages";
+    }
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public String getAllUsers(Model model) {

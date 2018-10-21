@@ -1,6 +1,7 @@
 package pl.coderslab.twitter.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -34,23 +35,45 @@ public class MessageController {
     Validator validator;
 
     @RequestMapping(value="/add", method = RequestMethod.GET) // /tweet/add?userId=1
-    public String showMessageForm(Model model, @RequestParam("senderId") Long senderId) { // TODO automativ strong 2 long conversion
+    public String showMessageForm(Model model/*, @RequestParam("senderId") Long senderId*/) { // TODO automativ strong 2 long conversion
+
+        User me = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        List<User> users = userRepository.findAll();
+        users.remove(me);
+
         Message m = new Message();
-        m.setSender(userRepository.findById(senderId).get());
         model.addAttribute("message", m);
+        model.addAttribute("userList", users);
+        model.addAttribute("disabled", false);
         return "messageForm";
     }
 
     @RequestMapping(value="/add", method = RequestMethod.POST)
-    public String saveTweet(@Valid Message message, BindingResult result, Model model) {
+    public String saveMessage(@Valid Message message, BindingResult result, Model model) {
 
         if (result.hasErrors()) {
             return "messageForm";
         }
-        User receiver = new User();
         message.setDate(new Date());
-        message.setReceiver(userRepository.getUserIdByUsername(receiver.getUsername()));
+        message.setReceiver(userRepository.getUserIdByUsername(message.getReceiver().getUsername()));
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        message.setSender(user);
         messageRepository.save(message);
         return "redirect:/user/" + message.getSender().getId() ;
     }
+
+    @RequestMapping(value = "/read", method = RequestMethod.GET)
+    public String readMessage(Model model, @RequestParam Long messageId){
+        Message m = messageRepository.findById(messageId).get();
+        model.addAttribute("message", m);
+        model.addAttribute("disabled", true);
+        User loggedIn = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(m.getSender().getId()!=loggedIn.getId()) {
+            m.setMessageRead(true);
+            messageRepository.save(m);
+        }
+        return "messageForm";
+    }
+
 }

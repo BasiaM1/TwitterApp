@@ -22,11 +22,10 @@
 
 <%@include file="common/nav.jsp" %>
 <div class="container">
-    <h1 class="form-heading">Registration Form</h1>
+    <h1 class="form-heading">Edit user's information</h1>
     <div class="login-form">
         <div class="main-div">
             <div class="panel">
-                <h2>User Registration</h2>
                 <p>All fields are mandatory</p>
             </div>
 
@@ -64,7 +63,7 @@
                     <form:errors path="aboutme" cssClass="error"/><br>
                 </div>
 
-                <button type="submit" class="btn btn-primary" value="Register">Register</button>
+                <button type="submit" class="btn btn-primary" value="Register">Submit</button>
 
             </form:form>
 

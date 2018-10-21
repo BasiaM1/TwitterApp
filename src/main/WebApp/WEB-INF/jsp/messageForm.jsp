@@ -19,15 +19,25 @@
     <form:hidden path="id"/>
     <form:hidden path="sender.id"/>
 
-    To user: <form:input path="receiver.username"/><br>
-    <form:errors path="receiver.username" cssClass="error" /><br><br>
-    Title: <form:textarea path="title" rows="3" cols="10"/><br>
+    <c:if test="${disabled==false}">To user:
+        <%--<form:input path="receiver.username"/>--%>
+        <form:select path="receiver" items="${userList}" itemLabel="name" disabled="${disabled}"/>
+        <br>
+        <form:errors path="receiver" cssClass="error" /><br><br>
+    </c:if>
+    Title: <form:textarea path="title" rows="3" cols="10" disabled="${disabled}"/><br>
     <form:errors path="title" cssClass="error" /><br><br>
-    Message text: <form:textarea path="textmessage" rows="3" cols="20"/><br>
+    Message text: <form:textarea path="textmessage" rows="3" cols="20" disabled="${disabled}"/><br>
     <form:errors path="textmessage" cssClass="error" /><br><br>
     <%--User: <form:select path="user.id" items="${allUsers}" itemLabel="username" itemValue="id"></form:select><br>--%>
 
-    <input type="submit" value="Submit">
+    <c:if test="${disabled==true}">
+        From: ${message.sender.name}<br/>
+        Date: ${message.date}
+    </c:if>
+    <c:if test="${disabled==false}">
+        <input type="submit" value="Submit">
+    </c:if>
 </form:form>
 
 
