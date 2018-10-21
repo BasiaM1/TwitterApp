@@ -1,6 +1,7 @@
 package pl.coderslab.twitter.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 
 @Entity
@@ -13,6 +14,7 @@ public class Comment {
 
     private Date created;
 
+    @NotEmpty
     private String text;
 
     @ManyToOne
